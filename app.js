@@ -17,7 +17,7 @@ var media = new Vue({
         </div>
     </div>
     
-    <div class="media-history" v-if="JSON.stringify(allHistory)!='{}'">
+    <div class="media-history" v-if="Object.keys(allHistory).length>0">
         <h2>播放历史</h2> 
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
@@ -59,7 +59,7 @@ var media = new Vue({
                 this.revertTime();
 
 
-                this.allHistory = []
+                this.allHistory = {}
                 if(this.pathname=='/'){
                     this.allHistory = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
                     for (let k in this.allHistory){
