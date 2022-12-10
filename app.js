@@ -17,7 +17,7 @@ var media = new Vue({
         </div>
     </div>
     
-    <div class="media-history" v-if="allHistory">
+    <div class="media-history" v-if="JSON.stringify(allHistory)!='{}'">
         <h2>播放历史</h2> 
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
