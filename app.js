@@ -178,6 +178,7 @@ var media = new Vue({
             this.$el.style.width = 'auto'
             this.$el.style.height = 'auto'
             this.$refs.player.style.display = 'none';
+            this.playfilename = null
             this.revertTime()
 
             if(this.art){
