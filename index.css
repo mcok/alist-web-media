@@ -37,7 +37,7 @@
 .media-files{
     display: flex;
     flex-wrap: wrap;
-    height: 88.5%;
+    height: 88vh;
     overflow: auto;
     align-content: baseline;
 }

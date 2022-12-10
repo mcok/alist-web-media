@@ -175,6 +175,10 @@ var media = new Vue({
             }
         },
         close(){
+            if(this.$refs.player.style.display=='none'){
+                document.getElementsByClassName('media')[0].style.display='none';
+                return
+            }
             this.$el.style.width = 'auto'
             this.$el.style.height = 'auto'
             this.$refs.player.style.display = 'none';
@@ -215,9 +219,9 @@ var media = new Vue({
     created(){
         this.currentDir()
         this.reBuildXHR()
-        this.revertTime();
     },
     mounted(){
+        this.revertTime();
         this.initplayer()
     }
 })
