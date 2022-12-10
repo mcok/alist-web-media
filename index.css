@@ -1,7 +1,7 @@
 .media{
     margin: 0 auto;
     background-color: #fff;
-    padding: 9px;
+    padding: 4px 9px;
     border-radius: 8px;
     position: fixed;
     top: 0;
@@ -15,7 +15,9 @@
     font-size: 16px;
     font-weight: 600;
     width: 17.6vw;
-    height: 99%;
+    height: 98vh;
+    display: flex;
+    flex-direction: column;
 }
 .media-title{
 
@@ -31,13 +33,17 @@
     word-break: break-all;
 }
 
+.media-item:hover {
+    background-color: #72bbff;
+}
+
 .media-item.media-current-item {
     background-color: #0f9f0f;
 }
 .media-files{
     display: flex;
     flex-wrap: wrap;
-    height: 88vh;
+    flex-grow: 1;
     overflow: auto;
     align-content: baseline;
 }
@@ -45,7 +51,7 @@
     margin: 0px 0 7px 0;
 }
 .media-nav-item{
-    border: 1px solid #00a6ed;
+    border: 1px solid #77d6ff;
     padding: 4px;
     display: inline-block;
     border-radius: 3px;
@@ -53,6 +59,10 @@
     font-weight: normal;
     cursor: pointer;
     font-size: 13px;
+}
+
+.media-nav-item:hover {
+    background-color: #e1eafb;
 } 
 .artplayer-app{
     flex-grow: 1;
@@ -78,4 +88,25 @@
     right: 2%;
     color: #f00;
     padding: 2px 8px;
+}
+.media-show-btn{
+    position: fixed;
+    writing-mode: tb-rl;
+    border-radius: 6px 0px 0px 6px;
+    border: 1px solid #1890ff;
+    right: 0;
+    padding: 6px;
+    cursor: pointer;
+    top: 19%;
+    background-color: #fff;
+}
+.media-show-btn:hover{
+    background-color: #1890ff;
+    color: #fff;
+}
+.media-player-title{
+    font-weight: 700;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 80vw;
 }

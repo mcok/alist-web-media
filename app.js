@@ -3,6 +3,8 @@ var media = new Vue({
     template:`
 <div class="media">
     <!--<template v-if="this.basename!="></template>-->
+    <div v-show="isHide" @click="show" class="media-show-btn">播放列表</div>
+    
     <div class="media-dir" v-if="sourcelists.length>0" >
         <div class="media-nav">
             <div v-if="revert" @click="revertPlay(revert.filename,revert.time)" class="media-nav-item media-nav-revent">▶继续播放{{revert.filename}}</div>
@@ -27,7 +29,7 @@ var media = new Vue({
     </div>
     
     <div class="artplayer-app" ref="player" style="display: none;">
-        {{pathname}}/{{playfilename}}
+        <div class="media-player-title">{{pathname}}/{{playfilename}}</div>
         <div id="artplayer" ref="player"></div>
     </div>
    
@@ -35,6 +37,7 @@ var media = new Vue({
     `,
     data(){
         return {
+            isHide:false,
             allHistory:{},
             mediaDir: [],
             sourcelists: {},
@@ -177,7 +180,8 @@ var media = new Vue({
         },
         close(){
             if(this.$refs.player.style.display=='none'){
-                document.getElementsByClassName('media')[0].style.display='none';
+                document.getElementsByClassName('media-dir')[0].style.display='none';
+                this.isHide = true
                 return
             }
             this.$el.style.width = 'auto'
@@ -189,6 +193,10 @@ var media = new Vue({
             if(this.art){
                 this.art.pause()
             }
+        },
+        show(){
+            this.isHide = false
+            document.getElementsByClassName('media-dir')[0].style.display='flex';
         },
         revertTime(){
             let mediaProcess = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
@@ -215,7 +223,7 @@ var media = new Vue({
             delete mediaProcess[dir]
             this.allHistory = mediaProcess
             localStorage.setItem('mediaProcess',JSON.stringify(mediaProcess))
-        }
+        },
     },
     created(){
         this.currentDir()
