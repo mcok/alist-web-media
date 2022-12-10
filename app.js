@@ -27,7 +27,7 @@ var media = new Vue({
     </div>
     
     <div class="artplayer-app" ref="player" style="display: none;">
-        {{playfilename}}
+        {{pathname}}/{{playfilename}}
         <div id="artplayer" ref="player"></div>
     </div>
    
