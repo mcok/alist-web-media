@@ -122,6 +122,7 @@ var media = new Vue({
             if(time!=null){
                 this.art.on('play', () => {
                     this.art.seek = time
+                    time = null;
                 });
             }
             this.art.on('video:ended',()=>{
