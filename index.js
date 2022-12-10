@@ -2,9 +2,6 @@ window.onload = ()=>{
     document.getElementsByName('body')
     loader.loadCss('index.css')
     loader.loadScript('artplayer.js')
-    loader.loadScript('axios.min.js').then(function (){
-        window.axios.defaults.headers.common['authorization'] = window.localStorage.getItem('token');
-    })
     loader.loadScript('vue.js')
         .then(function (){
             let div = document.createElement('div');
