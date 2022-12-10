@@ -1,0 +1,81 @@
+.media{
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 9px;
+    border-radius: 8px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: row-reverse;
+    z-index: 1;
+}
+.media-dir{
+    font-size: 16px;
+    font-weight: 600;
+    width: 17.6vw;
+    height: 99%;
+}
+.media-title{
+
+}
+.media-item{
+    font-size: 1rem;
+    padding: 5px;
+    font-weight: normal;
+    background-color: #1890ff;
+    color: #fff;
+    margin: 3px 3px;
+    cursor: pointer;
+    word-break: break-all;
+}
+
+.media-item.media-current-item {
+    background-color: #0f9f0f;
+}
+.media-files{
+    display: flex;
+    flex-wrap: wrap;
+    height: 88.5%;
+    overflow: auto;
+    align-content: baseline;
+}
+.media-nav{
+    margin: 0px 0 7px 0;
+}
+.media-nav-item{
+    border: 1px solid #00a6ed;
+    padding: 4px;
+    display: inline-block;
+    border-radius: 3px;
+    margin: 4px 4px;
+    font-weight: normal;
+    cursor: pointer;
+    font-size: 13px;
+} 
+.artplayer-app{
+    flex-grow: 1;
+}
+#artplayer{
+    width: 100%;
+    height: 96.5%;
+}
+.media-history{
+    width: 23vw;
+}
+.media-history-item{
+    cursor: pointer;
+    background-color: #efefef;
+    padding: 8px 27px 8px 8px;
+    margin: 9px 0px;
+    border-radius: 0px;
+    position: relative;
+}
+.media-history-delete{
+    position: absolute;
+    top: 4px;
+    right: 2%;
+    color: #f00;
+    padding: 2px 8px;
+}
