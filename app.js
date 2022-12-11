@@ -24,7 +24,7 @@ var media = new Vue({
         <h2>播放历史</h2> <span @click="close()" class="media-history-delete">x</span>
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
-            <span style="color: #00b91f;">{{history.timeFormat}}</span>
+            <span @click.prevert="autoRevertPlay(dir)" style="color: #00b91f;">{{history.timeFormat}}</span>
             <span @click.prevent="removeHistory(dir)" class="media-history-delete">x</span>
         </div>
     </div>
@@ -77,12 +77,7 @@ var media = new Vue({
                     this.show=1
                 }
 
-                this.revertTime();
-                let hash = location.hash.split('/')
-                if(hash && hash[1] && !this.revertPlayOnce){
-                    this.revertPlayOnce = 1
-                    this.revertPlay(this.revert.filename,this.revert.time)
-                }
+                this.revertTime(this.pathname);
 
                 this.$forceUpdate()
             }
@@ -91,8 +86,19 @@ var media = new Vue({
             axios.post('/api/fs/list',{
                 path:url,password:"",page:1,per_page:0,refresh:true
             }).then((response)=>{
-                this.loadList(response.data,url)
+                this.pathname = url
+                this.revertTime(this.pathname)
                 this.show = 1
+            })
+        },
+        autoRevertPlay(url){
+            axios.post('/api/fs/list',{
+                path:url,password:"",page:1,per_page:0,refresh:true
+            }).then((response)=>{
+                this.show = 1
+                this.pathname = url
+                this.revertTime(this.pathname)
+                this.revertPlay(this.revert.filename,this.revert.time)
             })
         },
         reBuildXHR(){
@@ -218,7 +224,7 @@ var media = new Vue({
             this.$el.style.height = 'auto'
             this.showPlayer = 0;
             this.playfilename = null
-            this.revertTime()
+            this.revertTime(this.pathname)
 
             if(this.art && this.art.playing){
                 this.art.pause()
@@ -238,10 +244,10 @@ var media = new Vue({
                 this.allHistory[k].timeFormat = Math.floor(this.allHistory[k].time/60) + ':' + this.allHistory[k].time%60
             }
         },
-        revertTime(){
+        revertTime(pathname){
             let mediaProcess = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
-            if(mediaProcess[this.pathname]){
-                this.revert = mediaProcess[this.pathname]
+            if(mediaProcess[pathname]){
+                this.revert = mediaProcess[pathname]
                 this.revert.timeFormat = Math.floor(this.revert.time/60) + ':' + this.revert.time%60
             }else{
                 this.revert = null
@@ -270,7 +276,7 @@ var media = new Vue({
             axios.post('/api/fs/list',{
                 path:this.currentDir(),password:"",page:1,per_page:0,refresh:true
             }).then((response)=>{
-                this.loadList(response.data,this.currentDir())
+                this.currentDir()
             })
         }
     },
@@ -278,7 +284,8 @@ var media = new Vue({
         this.show = Number(localStorage.getItem('MediaShow')??0)
     },
     mounted(){
-        this.revertTime();
+        this.currentDir()
+        this.revertTime(this.pathname);
         this.initplayer()
         this.reBuildXHR()
         this.firstLoad()
