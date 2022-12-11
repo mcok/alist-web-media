@@ -9,7 +9,6 @@
 自定义内容里加入如下代码：
 
 ```html
-<div id="media"></div>
 <script src="https://mcok.github.io/alist-web-media/index.js"></script>
 ```
 
