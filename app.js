@@ -3,10 +3,11 @@ var media = new Vue({
     template:`
 <div class="media">
     <!--<template v-if="this.basename!="></template>-->
-    <div v-show="isHide" @click="show" class="media-show-btn">媒体列表</div>
+    <div v-show="!show" @click="showPannel" class="media-show-btn">媒体列表</div>
     
-    <div id="media-dir" class="media-dir" v-if="sourcelists.length>0 && !isHide" >
+    <div id="media-dir" class="media-dir" v-if="sourcelists.length>0 && show==1" >
         <div class="media-nav">
+            <div>{{pathname}}</div>
             <div v-if="revert" @click="revertPlay(revert.filename,revert.time)" class="media-nav-item media-nav-revent">▶继续播放{{revert.filename}} <span style="color:#00b91f;">{{revert.timeFormat}}</span> </div>
             <div @click="prev()" class="media-nav-item media-nav-prev">⏮上一集</div>
             <div @click="next()" class="media-nav-item media-nav-next">⏭下一集</div>
@@ -19,7 +20,7 @@ var media = new Vue({
         </div>
     </div>
     
-    <div id="media-history" class="media-history" v-if="Object.keys(allHistory).length>0 && !isHide">
+    <div id="media-history" class="media-history" v-if="Object.keys(allHistory).length>0 && show==2">
         <h2>播放历史</h2> <span @click="close()" class="media-history-delete">x</span>
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
@@ -28,7 +29,7 @@ var media = new Vue({
         </div>
     </div>
     
-    <div class="artplayer-app" ref="player" style="display: none;">
+    <div class="artplayer-app" v-show="showPlayer" >
         <div class="media-player-title">{{pathname}}/{{playfilename}}</div>
         <div id="artplayer" ref="player"></div>
     </div>
@@ -37,7 +38,8 @@ var media = new Vue({
     `,
     data(){
         return {
-            isHide:0,
+            show:1,
+            showPlayer:0,
             allHistory:{},
             mediaDir: [],
             sourcelists: {},
@@ -49,39 +51,48 @@ var media = new Vue({
         }
     },
     watch:{
-        isHide(newValue){
-            localStorage.setItem('MediaIsHide',newValue)
-        }
+        show(newValue){
+            localStorage.setItem('MediaShow',newValue)
+            if(newValue==2){
+                this.refreshHistory()
+            }
+        },
     },
     methods:{
-        loadList(response){
+        loadList(response,pathname = null){
             this.firstLoaded = 1
             if(response.code==200){
-                this.currentDir()
-                this.closePlayer()
+                this.pathname = pathname??this.pathname
                 this.sourcelists = []
-
                 for (let ck in response.data.content){
                     if(response.data.content[ck].type==2){
-                        response.data.content[ck].url = this.pathname + '/' + response.data.content[ck].name
+                        response.data.content[ck].url = (pathname??this.pathname) + '/' + response.data.content[ck].name
                         this.sourcelists.push(response.data.content[ck])
                     }
                 }
-                this.revertTime();
-
-
-                this.allHistory = {}
-                if(this.pathname=='/'){
-                    this.allHistory = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
-                    for (let k in this.allHistory){
-                        this.allHistory[k].timeFormat = Math.floor(this.allHistory[k].time/60) + ':' + this.allHistory[k].time%60
-                    }
+                if(this.sourcelists.length==0){
+                    this.show = 2
+                }else{
+                    this.show = 1
                 }
+
+                this.revertTime();
+                let hash = location.hash.split('/')
+                if(hash && hash[1] && !this.revertPlayOnce){
+                    this.revertPlayOnce = 1
+                    this.revertPlay(this.revert.filename,this.revert.time)
+                }
+
                 this.$forceUpdate()
             }
         },
         jump(url){
-            location.href=url
+            axios.post('/api/fs/list',{
+                path:url,password:"",page:1,per_page:0,refresh:true
+            }).then((response)=>{
+                this.loadList(response.data,url)
+                this.show = 1
+            })
         },
         reBuildXHR(){
             function ajaxEventTrigger(event) {
@@ -104,11 +115,10 @@ var media = new Vue({
             window.XMLHttpRequest = newXHR;
 
             window.addEventListener('ajaxLoadEnd',(e)=> {
-                console.log(e)
                 let response = JSON.parse(e.detail.responseText)
                 if(response){
                     if(response.data && response.data.content){
-                        this.loadList(response);
+                        this.loadList(response,this.currentDir());
                     }
                 }
             })
@@ -117,29 +127,33 @@ var media = new Vue({
             this.pathname = decodeURIComponent(location.pathname);
             let paths = this.pathname.split('/')
             this.filename = paths.pop()
-            return this.basename = paths.join('/')
-
+            return this.pathname
         },
         playMedia(path,sign,time = null){
+            console.log(path,sign,time)
             this.$el.style.width = '100vw'
             this.$el.style.height = '100vh'
-            this.$refs.player.style.display = 'block';
+            this.showPlayer = 1;
 
             let src = location.protocol + '//' + location.host+'/d'+path+'?sign='+sign
             let subpaths = path.split('/');
             this.playfilename = subpaths.pop()
             this.art.switchUrl(src,this.playfilename)
+            this.art.title = this.playfilename
+            this.art.subtitle = this.playfilename
 
-            if(time!=null){
-                this.art.on('play', () => {
-                    this.art.seek = time
-                    time = null;
-                });
-            }
             this.art.on('video:ended',()=>{
                 this.next()
             })
-            this.art.play()
+
+            this.art.play().then(()=>{
+                if(time){
+                    this.art.currentTime = time
+                    time = null;
+                }
+            })
+
+            this.revert = null
         },
         initplayer(){
             this.art = new Artplayer({
@@ -187,25 +201,41 @@ var media = new Vue({
             }
         },
         close(){
-            if(this.$refs.player.style.display=='none'){
-                this.isHide = 1
-                return
+            if(this.showPlayer==0){
+                if(this.show==1){
+                    this.show =2
+                }else if(this.show==2){
+                    this.show = 0
+                }
+            }else{
+                this.closePlayer()
             }
-            this.closePlayer()
         },
         closePlayer(){
+            console.log('closePlayer')
             this.$el.style.width = 'auto'
             this.$el.style.height = 'auto'
-            this.$refs.player.style.display = 'none';
+            this.showPlayer = 0;
             this.playfilename = null
             this.revertTime()
 
-            if(this.art){
+            if(this.art && this.art.playing){
                 this.art.pause()
             }
         },
-        show(){
-            this.isHide = 0
+        showPannel(){
+            if(this.sourcelists.length>0){
+                this.show = 1
+            }else{
+                this.refreshHistory()
+                this.show = 2
+            }
+        },
+        refreshHistory(){
+            this.allHistory = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
+            for (let k in this.allHistory){
+                this.allHistory[k].timeFormat = Math.floor(this.allHistory[k].time/60) + ':' + this.allHistory[k].time%60
+            }
         },
         revertTime(){
             let mediaProcess = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
@@ -223,9 +253,7 @@ var media = new Vue({
                 }
             }
             if(sign){
-                console.log(this.pathname+'/'+filename,sign,time)
                 this.playMedia(this.pathname+'/'+filename,sign,time)
-                this.revert = null
             }
         },
         removeHistory(dir){
@@ -234,15 +262,22 @@ var media = new Vue({
             this.allHistory = mediaProcess
             localStorage.setItem('mediaProcess',JSON.stringify(mediaProcess))
         },
+        //当插件初始化完成的时候，有概率没有监听到当前文件列表页的数据，所有有必要进行第一次文件列表的加载
+        firstLoad(){
+            axios.post('/api/fs/list',{
+                path:this.pathname,password:"",page:1,per_page:0,refresh:true
+            }).then((response)=>{
+                this.loadList(response.data,this.currentDir())
+            })
+        }
     },
     created(){
-        this.currentDir()
-        this.reBuildXHR()
-
-        this.isHide = parseInt(localStorage.getItem('MediaIsHide'))
+        this.show = Number(localStorage.getItem('MediaShow')??0)
     },
     mounted(){
         this.revertTime();
         this.initplayer()
+        this.reBuildXHR()
+        this.firstLoad()
     }
 })

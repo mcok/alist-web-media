@@ -1,14 +1,19 @@
 window.onload = ()=>{
     document.getElementsByName('body')
     loader.loadCss('index.css')
-    loader.loadScript('artplayer.js')
-    loader.loadScript('vue.js')
-        .then(function (){
-            let div = document.createElement('div');
-            div.id = 'media'
-            document.body.appendChild(div);
-            loader.loadScript('app.js')
-        })
+    loader.loadScript('axios.min.js').then(function (){
+        window.axios.defaults.headers.common['authorization'] = window.localStorage.getItem('token');
+    })
+    loader.loadScript('artplayer.js').then(()=>{
+        loader.loadScript('vue.js')
+            .then(function (){
+                let div = document.createElement('div');
+                div.id = 'media'
+                document.body.appendChild(div);
+                loader.loadScript('app.js')
+            })
+    })
+
 }
 
 var loader = {
