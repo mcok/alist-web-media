@@ -3,11 +3,11 @@ var media = new Vue({
     template:`
 <div class="media">
     <!--<template v-if="this.basename!="></template>-->
-    <div v-show="isHide" @click="show" class="media-show-btn">播放列表</div>
+    <div v-show="isHide" @click="show" class="media-show-btn">媒体列表</div>
     
-    <div class="media-dir" v-if="sourcelists.length>0" >
+    <div id="media-dir" class="media-dir" v-if="sourcelists.length>0 && !isHide" >
         <div class="media-nav">
-            <div v-if="revert" @click="revertPlay(revert.filename,revert.time)" class="media-nav-item media-nav-revent">▶继续播放{{revert.filename}}</div>
+            <div v-if="revert" @click="revertPlay(revert.filename,revert.time)" class="media-nav-item media-nav-revent">▶继续播放{{revert.filename}} <span style="color:#00b91f;">{{revert.timeFormat}}</span> </div>
             <div @click="prev()" class="media-nav-item media-nav-prev">⏮上一集</div>
             <div @click="next()" class="media-nav-item media-nav-next">⏭下一集</div>
             <div @click="close()" class="media-nav-item media-nav-next">❌关闭</div>
@@ -19,11 +19,11 @@ var media = new Vue({
         </div>
     </div>
     
-    <div class="media-history" v-if="Object.keys(allHistory).length>0">
-        <h2>播放历史</h2> 
+    <div id="media-history" class="media-history" v-if="Object.keys(allHistory).length>0 && !isHide">
+        <h2>播放历史</h2> <span @click="close()" class="media-history-delete">x</span>
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
-            <span>{{history.timeFormat}}</span>
+            <span style="color: #00b91f;">{{history.timeFormat}}</span>
             <span @click="removeHistory(dir)" class="media-history-delete">x</span>
         </div>
     </div>
@@ -37,20 +37,28 @@ var media = new Vue({
     `,
     data(){
         return {
-            isHide:false,
+            isHide:0,
             allHistory:{},
             mediaDir: [],
             sourcelists: {},
             pathname: null,
             basename: null,
             playfilename: null,
-            revert: null
+            revert: null,
+            firstLoaded:0
+        }
+    },
+    watch:{
+        isHide(newValue){
+            localStorage.setItem('MediaIsHide',newValue)
         }
     },
     methods:{
         loadList(response){
+            this.firstLoaded = 1
             if(response.code==200){
                 this.currentDir()
+                this.closePlayer()
                 this.sourcelists = []
 
                 for (let ck in response.data.content){
@@ -180,10 +188,12 @@ var media = new Vue({
         },
         close(){
             if(this.$refs.player.style.display=='none'){
-                document.getElementsByClassName('media-dir')[0].style.display='none';
-                this.isHide = true
+                this.isHide = 1
                 return
             }
+            this.closePlayer()
+        },
+        closePlayer(){
             this.$el.style.width = 'auto'
             this.$el.style.height = 'auto'
             this.$refs.player.style.display = 'none';
@@ -195,13 +205,13 @@ var media = new Vue({
             }
         },
         show(){
-            this.isHide = false
-            document.getElementsByClassName('media-dir')[0].style.display='flex';
+            this.isHide = 0
         },
         revertTime(){
             let mediaProcess = JSON.parse(localStorage.getItem('mediaProcess')??'{}')
             if(mediaProcess[this.pathname]){
                 this.revert = mediaProcess[this.pathname]
+                this.revert.timeFormat = Math.floor(this.revert.time/60) + ':' + this.revert.time%60
             }
         },
         revertPlay(filename,time){
@@ -228,6 +238,8 @@ var media = new Vue({
     created(){
         this.currentDir()
         this.reBuildXHR()
+
+        this.isHide = parseInt(localStorage.getItem('MediaIsHide'))
     },
     mounted(){
         this.revertTime();

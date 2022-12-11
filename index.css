@@ -88,6 +88,7 @@
     right: 2%;
     color: #f00;
     padding: 2px 8px;
+    cursor: pointer;
 }
 .media-show-btn{
     position: fixed;
