@@ -24,7 +24,7 @@ var media = new Vue({
         <h2>播放历史</h2> <span @click="close()" class="media-history-delete">x</span>
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
-            <span @click.prevert="autoRevertPlay(dir)" style="color: #00b91f;">{{history.timeFormat}}</span>
+            <span @click.prevert="autoRevertPlay(dir)" style="color: #00b91f;">▶{{history.timeFormat}}</span>
             <span @click.prevent="removeHistory(dir)" class="media-history-delete">x</span>
         </div>
     </div>
