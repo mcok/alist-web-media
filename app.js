@@ -243,6 +243,8 @@ var media = new Vue({
             if(mediaProcess[this.pathname]){
                 this.revert = mediaProcess[this.pathname]
                 this.revert.timeFormat = Math.floor(this.revert.time/60) + ':' + this.revert.time%60
+            }else{
+                this.revert = null
             }
         },
         revertPlay(filename,time){
