@@ -25,7 +25,7 @@ var media = new Vue({
         <div @click="jump(dir)" class="media-history-item" v-for="(history,dir) in allHistory">
             {{dir}}/{{history.filename}} 
             <span style="color: #00b91f;">{{history.timeFormat}}</span>
-            <span @click="removeHistory(dir)" class="media-history-delete">x</span>
+            <span @click.prevent="removeHistory(dir)" class="media-history-delete">x</span>
         </div>
     </div>
     
@@ -70,10 +70,11 @@ var media = new Vue({
                         this.sourcelists.push(response.data.content[ck])
                     }
                 }
-                if(this.sourcelists.length==0){
+                if(this.sourcelists.length==0 && this.show==1){
                     this.show = 2
-                }else{
-                    this.show = 1
+                }
+                if(this.sourcelists.length>0 && this.show==2){
+                    this.show=1
                 }
 
                 this.revertTime();
