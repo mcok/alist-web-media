@@ -268,7 +268,7 @@ var media = new Vue({
         //当插件初始化完成的时候，有概率没有监听到当前文件列表页的数据，所有有必要进行第一次文件列表的加载
         firstLoad(){
             axios.post('/api/fs/list',{
-                path:this.pathname,password:"",page:1,per_page:0,refresh:true
+                path:this.currentDir(),password:"",page:1,per_page:0,refresh:true
             }).then((response)=>{
                 this.loadList(response.data,this.currentDir())
             })
