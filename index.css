@@ -1,6 +1,6 @@
 .media{
     margin: 0 auto;
-    background-color: #fff;
+    /* background-color: #fff; */
     padding: 4px 9px;
     border-radius: 8px;
     position: fixed;
@@ -11,6 +11,10 @@
     flex-direction: row-reverse;
     z-index: 1;
 }
+.hope-ui-dark .media{
+    background-color: #000000b8;
+}
+
 .media-dir{
     font-size: 16px;
     font-weight: 600;
@@ -63,7 +67,7 @@
 
 .media-nav-item:hover {
     background-color: #e1eafb;
-} 
+}
 .artplayer-app{
     flex-grow: 1;
 }
@@ -76,7 +80,6 @@
 }
 .media-history-item{
     cursor: pointer;
-    background-color: #efefef;
     padding: 8px 27px 8px 8px;
     margin: 9px 0px;
     border-radius: 0px;
@@ -99,7 +102,6 @@
     padding: 6px;
     cursor: pointer;
     top: 19%;
-    background-color: #fff;
 }
 .media-show-btn:hover{
     background-color: #1890ff;
@@ -110,4 +112,19 @@
     overflow: hidden;
     white-space: nowrap;
     max-width: 80vw;
+}
+
+@media (max-width: 800px){
+    .media {flex-direction: column-reverse;}
+    .media-dir{
+        width: 52.6vw;
+        margin-top: 3vh;
+    }
+    .artplayer-app{
+        height: 69vh;
+    }
+    .media-with-player{width: 97vw;}
+    .media-history{
+        width: 59vw;
+    }
 }

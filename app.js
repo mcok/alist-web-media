@@ -5,7 +5,7 @@ var media = new Vue({
     <!--<template v-if="this.basename!="></template>-->
     <div v-show="!show" @click="showPannel" class="media-show-btn">媒体列表</div>
     
-    <div id="media-dir" class="media-dir" v-if="sourcelists.length>0 && show==1" >
+    <div id="media-dir" class="media-dir" :class="{'media-with-player':showPlayer}" v-if="sourcelists.length>0 && show==1" >
         <div class="media-nav">
             <div>{{pathname}}</div>
             <div v-if="revert" @click="revertPlay(revert.filename,revert.time)" class="media-nav-item media-nav-revent">▶继续播放{{revert.filename}} <span style="color:#00b91f;">{{revert.timeFormat}}</span> </div>
